@@ -2,6 +2,8 @@ package parallel;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +27,11 @@ public class CsvImporter implements Callable<List<Player>> {
 	}
     
     public static List<Player> mapCsvToPlayer(String path) {
-    	System.out.println("reading file: "+ path);
+    //	System.out.println("reading file: "+ path);
+    
+    	
     	try {
-    		Thread.sleep(500);
+    	//	Thread.sleep(500);
     	}
     	catch (Exception e) {
             e.printStackTrace();
@@ -71,12 +75,13 @@ public class CsvImporter implements Callable<List<Player>> {
         @SuppressWarnings("deprecation")
 		List<Player> list = csvToBean.parse(strategy, csvReader); 
   
-        // print details of Bean object 
-//        for (Player e : list) { 
-//        	if(Integer.valueOf(e.Age) < 25 && Integer.valueOf(e.Age) > 23) {
-//            System.out.println(e.Name +" "+ e.Age); 
-//        	}
-//        } 
+        for (Player player : list) { 
+        	player.setPotential();
+        }
+        
+		Comparator<Player> compareByPotential = Comparator.comparing((Player p) -> p.Potential).reversed();
+		Collections.sort(list, compareByPotential);
+
         return list;
     }
 

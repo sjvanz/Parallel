@@ -29,18 +29,20 @@ public class parallel {
 			players.addAll(f.get());
 		}
 		pool.shutdown();
-		for (Player player : players) {
-			System.out.println("Name " + player.Name+ " Ballcontrol"+ player.BallControl);
-			player.setPotential();
-		}
 		
-		Comparator<Player> compareByPotential = (Player p1, Player p2) -> p1.Potential.compareTo( p2.Potential);
-		 
+		Comparator<Player> compareByPotential = Comparator.comparing((Player p) -> p.Potential).reversed();
 		Collections.sort(players, compareByPotential);
 		
-		for (Player player : players) {
-			System.out.println("Name " + player.Name);
+
+//		for (Player player : players) {
+//			System.out.println("Name " + player.Name);
+//		}
+		
+		for (int i = 0; i< 10; i++) {
+			System.out.println("Name " + players.get(i).Name);
 		}
+		
+		
 		double nano_endTime = System.nanoTime();
 		double total = nano_endTime - startTime;
 		System.out.println("Nano endtime: " + total);
