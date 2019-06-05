@@ -23,7 +23,7 @@ public class parallel {
 		 * 
 		 */
 
-		String data = "resources/data12bestanden/data12bestanden/";
+		String data = "resources/data/";
 		/*
 		 * uncomment for data n2 String data = "resources/data2/";
 		 */
@@ -37,14 +37,19 @@ public class parallel {
 		 */
 
 		/*
-		 * stap 1 parallelInlezenNietSorteren(data);
+		 * stap 1 
 		 */
+		parallelInlezenNietSorteren(data);
 
 		/*
 		 * stap 2
-		 * 
+		 * 	parallelInlezenEnSorteren(data);
 		 */
-		parallelInlezenEnSorteren(data);
+	
+		/*
+		 * parallelInlezenEnSorterenV2(String data) 
+		 * This is work in progress. 
+		 */
 
 	}
 
