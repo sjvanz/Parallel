@@ -9,6 +9,7 @@ public  class Player{
     String Vision;
     String SkillMoves;
     String WeakFoot;
+    String Nationality;
     Integer Potential;
 
 //   public Player(String name, int age, int ballControl, int sprintSpeed, int vision, int skillMoves, int weakFoot) {
@@ -75,6 +76,14 @@ public  class Player{
 
    public void setWeakFoot(String weakFoot) {
        WeakFoot = weakFoot;
+   }
+   
+   public String getNationality() {
+       return WeakFoot;
+   }
+
+   public void setNationality(String nationality) {
+	   Nationality = nationality;
    }
    
    public void setPotential() {

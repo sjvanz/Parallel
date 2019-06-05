@@ -1,19 +1,21 @@
 package parallel;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
 
 
-public class CsvImporter implements Callable<List<Player>> {
+public class CsvImporterAndSort implements Callable<List<Player>> {
 
     String path;
     static int id;
-    public CsvImporter(String s) {
+    public CsvImporterAndSort(String s) {
         this.path = s;
     }
 
@@ -65,12 +67,44 @@ public class CsvImporter implements Callable<List<Player>> {
 
 //         print details of Bean object
         
+
+    
+        for (Player player : list) {
+            player.setPotential(); {
+            }
+        }
+    
+        Comparator<Player> compareByPotential = Comparator.comparing((Player p) -> p.Potential).reversed();
+        list.sort(compareByPotential);
+		
+        
+        /*
+         *  uncomment for step x
+        list = bestOfCountry(list, "France");
+          */
+        
+        /*
+         * uncomment for step x
+        list = bestOfCountry(bestOfCountryWhen20(list, "25"), "Netherlands");
+         */
+        
         return list;
 
     }
+    public static List<Player> bestOfCountryWhen20(List<Player> players, String age) {
+        List<Player> bestOfCountry = players.parallelStream().filter(p -> age.equals(p.Age))
+                .collect(Collectors.toList());
+        return bestOfCountry;
+    }
 
+    public static List<Player> bestOfCountry(List<Player> players, String country) {
+        List<Player> bestOfCountry = players.parallelStream().filter(p -> country.equals(p.Nationality))
+                .collect(Collectors.toList());
+        return bestOfCountry;
+    }
 
 }
+
 
 
 
