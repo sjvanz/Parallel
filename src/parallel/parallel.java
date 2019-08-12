@@ -36,7 +36,6 @@ public class parallel {
 		String data = "data.csv";
 		nietParallel(data);
 		parallel(data);
-
 	}
 
 	public static void parallel(String data) {
@@ -129,15 +128,4 @@ public class parallel {
 		return player;
 	};
 
-	public static List<Player> bestOfCountry(List<Player> players, String country) {
-		List<Player> bestOfCountry = players.stream().parallel().filter(p -> country.equals(p.Nationality))
-				.collect(Collectors.toList());
-		return bestOfCountry;
-	}
-
-	public static List<Player> bestPerAge(List<Player> players, String age) {
-		List<Player> bestOfCountry = players.stream().parallel().filter(p -> age.equals(p.Age))
-				.collect(Collectors.toList());
-		return bestOfCountry;
-	}
 }
