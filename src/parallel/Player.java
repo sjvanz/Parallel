@@ -79,31 +79,33 @@ public  class Player{
    }
    
    public String getNationality() {
-       return WeakFoot;
+       return Nationality;
    }
 
    public void setNationality(String nationality) {
 	   Nationality = nationality;
    }
    
+   public int getPotential( ) {
+	   return Potential;
+   }
+   
    public void setPotential() {
-	   if((this.BallControl.isEmpty() || this.BallControl == null)) {
+	   if((this.BallControl == null  || this.BallControl.isEmpty())) {
 		   this.BallControl = "0";
 	   }
-	   if((this.SkillMoves.isEmpty() || this.SkillMoves == null)) {
+	   if(( this.SkillMoves == null || this.SkillMoves.isEmpty())) {
 		   this.SkillMoves = "0";
 	   }
-	   if((this.SprintSpeed.isEmpty() || this.SprintSpeed == null)) {
+	   if((this.SprintSpeed == null || this.SprintSpeed.isEmpty())) {
 		   this.SprintSpeed = "0";
 	   }
-	   if((this.Vision.isEmpty() || this.Vision == null)) {
+	   if((this.Vision == null || this.Vision.isEmpty() )) {
 		   this.Vision = "0";
 	   }
-	   if((this.WeakFoot.isEmpty() || this.WeakFoot == null)) {
+	   if((this.WeakFoot == null || this.WeakFoot.isEmpty())) {
 		   this.WeakFoot = "0";
 	   }
-			  
-		   
 	   this.Potential = (
 			   Integer.valueOf(this.BallControl) + 
 			   (Integer.valueOf(this.SkillMoves)* 20) + 
