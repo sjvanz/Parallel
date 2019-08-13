@@ -10,7 +10,7 @@ public  class Player{
     String SkillMoves;
     String WeakFoot;
     String Nationality;
-    Integer Potential;
+	Integer Potential;
 
 //   public Player(String name, int age, int ballControl, int sprintSpeed, int vision, int skillMoves, int weakFoot) {
 //       Name = name;
@@ -83,12 +83,14 @@ public  class Player{
    }
 
    public void setNationality(String nationality) {
+	   
 	   Nationality = nationality;
    }
    
    public int getPotential( ) {
 	   return Potential;
    }
+   
    
    public void setPotential() {
 	   if((this.BallControl == null  || this.BallControl.isEmpty())) {

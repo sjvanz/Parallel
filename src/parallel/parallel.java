@@ -34,27 +34,42 @@ public class parallel {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
 		String data = "data.csv";
-		nietParallel(data);
+		
+		
+		
+		//nietParallel(data);
 		parallel(data);
 	}
 
 	public static void parallel(String data) {
-		
+		List<String> landen = new ArrayList<String>();
 		double startTime = System.nanoTime();
 		List<Player> inputList = new ArrayList<Player>();
 		
 		try {
-			File inputF = new File(data);
+			File inputF =
+					new File(data);
 			InputStream inputFS = new FileInputStream(inputF);
 			BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
 			// reading from one source instead of multiple
 			Runtime runtime = Runtime.getRuntime();
 			System.out.println("Number of available processors: " + runtime.availableProcessors());
-			Comparator<Player> compareByPotential = Comparator.comparing((Player p) -> p.Potential).reversed();		
-			//		.thenComparing((Player p) -> p.Potential).reversed();
+			
 
+			Comparator<Player> compareByPotential2 = new Comparator<Player>() {
+				@Override
+				public int compare(Player o1, Player o2) {
+	                return o1.getNationality()
+	                        .compareTo(o2.getNationality());
+				};
+			};
+			
+			Comparator<Player> compareByPotential = //Comparator.comparing((Player p) -> p.Potential).reversed();		
+					compareByPotential2.reversed().thenComparing((Player p) -> p.Potential).reversed();
+			
 			inputList = br.lines().parallel().skip(1)
 					.map(mapToItem)
+					.filter(c -> c.getNationality() != null || c.getNationality() != "")
 					.sorted(compareByPotential)
 					.collect(Collectors.toList());
 
@@ -63,7 +78,7 @@ public class parallel {
 
 		}
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < inputList.size(); i++) {
 			System.out.println("Country: " + inputList.get(i).Nationality + " Name: " + inputList.get(i).Name + " "
 					+ "Potential: " + inputList.get(i).Potential);
 		}
@@ -85,11 +100,21 @@ public class parallel {
 			// reading from one source instead of multiple
 			Runtime runtime = Runtime.getRuntime();
 			System.out.println("Number of available processors: " + runtime.availableProcessors());
-			Comparator<Player> compareByPotential = Comparator.comparing((Player p) -> p.Potential).reversed();		
-			//		.thenComparing((Player p) -> p.Potential).reversed();
+			
+			Comparator<Player> compareByPotential2 = new Comparator<Player>() {
+				@Override
+				public int compare(Player o1, Player o2) {
+	                return ((Player)o1).getNationality()
+	                        .compareTo(((Player)o2).getNationality());
+				};
+			};
+			
+			Comparator<Player> compareByPotential = //Comparator.comparing((Player p) -> p.Potential).reversed();		
+					compareByPotential2.thenComparing((Player p) -> p.Potential).reversed();
 
 			inputList = br.lines().skip(1)
 					.map(mapToItem)
+					//.filter(c -> c.getNationality() != null || c.getNationality() != "")
 					.sorted(compareByPotential)
 					.collect(Collectors.toList());
 
@@ -123,7 +148,16 @@ public class parallel {
 			player.setBallControl(p[63].trim());
 			player.setSprintSpeed(p[66].trim());
 		}
-
+		else {
+			player.setName("");
+			player.setAge("");
+			player.setNationality("");
+			player.setWeakFoot("");
+			player.setSkillMoves("");
+			player.setVision("");
+			player.setBallControl("");
+			player.setSprintSpeed("");
+		}
 		player.setPotential();
 		return player;
 	};
