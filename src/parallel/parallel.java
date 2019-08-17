@@ -17,6 +17,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,15 +35,12 @@ public class parallel {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
 		String data = "data.csv";
-		
-		
-		
 		//nietParallel(data);
 		parallel(data);
 	}
 
 	public static void parallel(String data) {
-		List<String> landen = new ArrayList<String>();
+		List<Player> filteredList = new ArrayList<Player>();
 		double startTime = System.nanoTime();
 		List<Player> inputList = new ArrayList<Player>();
 		
@@ -56,7 +54,7 @@ public class parallel {
 			System.out.println("Number of available processors: " + runtime.availableProcessors());
 			
 
-			Comparator<Player> compareByPotential2 = new Comparator<Player>() {
+			Comparator<Player> compareByNationality = new Comparator<Player>() {
 				@Override
 				public int compare(Player o1, Player o2) {
 	                return o1.getNationality()
@@ -64,23 +62,27 @@ public class parallel {
 				};
 			};
 			
-			Comparator<Player> compareByPotential = //Comparator.comparing((Player p) -> p.Potential).reversed();		
-					compareByPotential2.reversed().thenComparing((Player p) -> p.Potential).reversed();
+			Comparator<Player> compareByPotential = compareByNationality.reversed().thenComparing((Player p) -> p.Potential).reversed();
 			
 			inputList = br.lines().parallel().skip(1)
 					.map(mapToItem)
-					.filter(c -> c.getNationality() != null || c.getNationality() != "")
+					.filter(c -> c.getPotential() != 0)
 					.sorted(compareByPotential)
 					.collect(Collectors.toList());
-
+			
+			
+			
 			br.close();
+		
+			filteredList = inputList.stream().parallel()
+					.filter(distinctByNationality(Player::getNationality))
+					.collect(Collectors.toList());
 		} catch (IOException e) {
 
 		}
-
-		for (int i = 0; i < inputList.size(); i++) {
-			System.out.println("Country: " + inputList.get(i).Nationality + " Name: " + inputList.get(i).Name + " "
-					+ "Potential: " + inputList.get(i).Potential);
+		for (int i = 0; i < 50; i++) {
+			System.out.println("Country: " + filteredList.get(i).Nationality + " Name: " + filteredList.get(i).Name + " "
+					+ "Potential: " + filteredList.get(i).Potential);
 		}
 
 		double nano_endTime = System.nanoTime();
@@ -88,6 +90,10 @@ public class parallel {
 		System.out.println("Parallel endtime: " + total);
 	}
 
+	public static <T> Predicate<T> distinctByNationality(Function<? super T, ?> keyExtractor) {
+	    Set<Object> seen = ConcurrentHashMap.newKeySet();
+	    return t -> seen.add(keyExtractor.apply(t));
+	}
 	public static void nietParallel(String data) {
 		
 		double startTime = System.nanoTime();
