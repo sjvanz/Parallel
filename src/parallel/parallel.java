@@ -69,9 +69,7 @@ public class parallel {
 					.filter(c -> c.getPotential() != 0)
 					.sorted(compareByPotential)
 					.collect(Collectors.toList());
-			
-			
-			
+
 			br.close();
 		
 			filteredList = inputList.stream().parallel()
