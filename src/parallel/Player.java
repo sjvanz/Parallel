@@ -109,7 +109,7 @@ public int getPotential( ) {
 		   this.WeakFoot = "0";
 	   }
 	   this.Potential = (
-			   Integer.valueOf(this.BallControl) + 
+			   Integer.valueOf(this.BallControl) +
 			   (Integer.valueOf(this.SkillMoves)* 20) + 
 			   Integer.valueOf(this.SprintSpeed)  +
 			   Integer.valueOf(this.Vision) + 

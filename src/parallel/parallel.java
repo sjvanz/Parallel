@@ -36,7 +36,7 @@ public class parallel {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
 		String data = "data.csv";
-		// nietParallel(data);
+		 nietParallel(data);
 		parallel(data);
 	}
 
@@ -45,7 +45,6 @@ public class parallel {
 		List<Player> filteredByAgeList = new ArrayList<Player>();
 		List<Player> BestValueFromTenProcentLists = new ArrayList<Player>();
 		double startTime = System.nanoTime();
-		//Map<String, List<Player>> inputList = (Map<String, List<Player>>) new ArrayList<Player>();
 		
 		try {
 			File inputF =
@@ -77,6 +76,7 @@ public class parallel {
 					.filter(c -> c.getPotential() != 0)
 					.sorted(compareByNationalityThenPotential)	
 					.collect(Collectors.toList());
+
 			
 			br.close();
  	    
@@ -91,6 +91,7 @@ public class parallel {
 			
 			//Non-parallel filter only keep the first entry of every player by age,
 			filteredByAgeList = filteredByAgeList.stream().filter(distinctByProperty(Player::getAge)).collect(Collectors.toList());
+
 		
 			//Group by Nationality after sorting creating a List with List of players
 		    Map<String, List<Player>> groups = 
@@ -98,37 +99,129 @@ public class parallel {
 		    	    List<List<Player>> subSets = new ArrayList<List<Player>>(groups.values());
 		    	  
 		    	    // first limit to the first 10% of a certain list (it is sorted by potential so it gives the best 10% of players fo every 
-		    	    subSets.parallelStream()
+		    	    subSets.stream()
 		    	    		.forEach(l -> l.parallelStream()
 		    	    				.limit((long)(l.size() / 10))
 		    	    				.reduce((x,y) -> (x.getValue() < y.getValue() ? x : y ))
-		    	    				.map(mapper)
+		    	    				.ifPresent(p -> BestValueFromTenProcentLists.add(p)));
 	
 		    	    				
 		    	    		
 		} catch (IOException e) {
 
 		}
-		//BestValueFromTenProcentLists.add
-//		for (int i = 0; i < filteredByNationalityList.size(); i++) {
-//			System.out.println("Country: " + filteredByNationalityList.get(i).Nationality + " Name: " + filteredByNationalityList.get(i).Name + " "
-//					+ "Potential: " + filteredByNationalityList.get(i).getPotential());
-//		}
-//		System.out.println("\n");
-//		for (int i = 0; i < filteredByAgeList.size(); i++) {
-//			System.out.println("Age: " + filteredByAgeList.get(i).Age + " Name: " + filteredByAgeList.get(i).Name + " "
-//					+ "Potential: " + filteredByAgeList.get(i).getPotential());
-//		}
+
+		for (int i = 0; i < filteredByNationalityList.size(); i++) {
+			System.out.println("Country: " + filteredByNationalityList.get(i).Nationality + " Name: " + filteredByNationalityList.get(i).Name + " "
+					+ "Potential: " + filteredByNationalityList.get(i).getPotential());
+		}
+		System.out.println("\n");
+		for (int i = 0; i < filteredByAgeList.size(); i++) {
+			System.out.println("Age: " + filteredByAgeList.get(i).Age + " Name: " + filteredByAgeList.get(i).Name + " "
+					+ "Potential: " + filteredByAgeList.get(i).getPotential());
+		}
 		
 		for (int i = 0; i < BestValueFromTenProcentLists.size(); i++) {
-		System.out.println("Age: " + BestValueFromTenProcentLists.get(i).Age + " Name: " + BestValueFromTenProcentLists.get(i).Name + " "
-				+ "Potential: " + BestValueFromTenProcentLists.get(i).getPotential());
+		System.out.println("Country: " + BestValueFromTenProcentLists.get(i).Nationality + " Name: " + BestValueFromTenProcentLists.get(i).Name + " "
+				+ "Potential: " + BestValueFromTenProcentLists.get(i).getPotential() + "Value: "+BestValueFromTenProcentLists.get(i).Value);
 	}
 
 
 		double nano_endTime = System.nanoTime();
 		double total = nano_endTime - startTime;
 		System.out.println("Parallel endtime: " + total);
+	}
+	
+	public static void nietParallel(String data) {
+		List<Player> filteredByNationalityList = new ArrayList<Player>();
+		List<Player> filteredByAgeList = new ArrayList<Player>();
+		List<Player> BestValueFromTenProcentLists = new ArrayList<Player>();
+		double startTime = System.nanoTime();
+		
+		try {
+			File inputF =
+					new File(data);
+			InputStream inputFS = new FileInputStream(inputF);
+			BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
+			// reading from one source instead of multiple
+			Runtime runtime = Runtime.getRuntime();
+			System.out.println("Number of available processors: " + runtime.availableProcessors());
+			
+
+			Comparator<Player> compareByNationality = new Comparator<Player>() {
+				@Override
+				public int compare(Player o1, Player o2) {
+	                return o1.getNationality()
+	                        .compareTo(o2.getNationality());
+				};
+			};
+			
+			Comparator<Player> compareByNationalityThenPotential = compareByNationality.reversed().thenComparing((Player p) -> p.Potential).reversed();
+			Comparator<Player> compareByAgeThenPotential = Comparator
+					  .comparing(Player::getAge).thenComparing((Player p) -> p.Potential).reversed();
+			
+			Comparator<Player> compareByPotential = Comparator.comparing(Player::getPotential).reversed();
+			
+			//Parallel mapping and double sort(first Nationality, if Nationality is the same, look at Potential
+			List<Player> inputList = br.lines().skip(1)
+					.map(mapToItem)
+					.filter(c -> c.getPotential() != 0)
+					.sorted(compareByNationalityThenPotential)	
+					.collect(Collectors.toList());
+
+			
+			br.close();
+ 	    
+			//Non-parallel filter only keep the first entry of every Nation,
+			//if you would make it parallel the distinct function could pick up lower potential player in the "seen" hashmap
+			filteredByNationalityList = inputList.stream()
+					.filter(distinctByProperty(Player::getNationality))
+					.collect(Collectors.toList());
+			
+			//Re-sort to compare to age then potential 
+			filteredByAgeList = inputList.stream().sorted(compareByAgeThenPotential).collect(Collectors.toList());
+			
+			//Non-parallel filter only keep the first entry of every player by age,
+			filteredByAgeList = filteredByAgeList.stream().filter(distinctByProperty(Player::getAge)).collect(Collectors.toList());
+
+		
+			//Group by Nationality after sorting creating a List with List of players
+		    Map<String, List<Player>> groups = 
+		    		inputList.parallelStream().sorted(compareByPotential).collect(Collectors.groupingBy(Player::getNationality));
+		    	    List<List<Player>> subSets = new ArrayList<List<Player>>(groups.values());
+		    	  
+		    	    // first limit to the first 10% of a certain list (it is sorted by potential so it gives the best 10% of players fo every 
+		    	    subSets.stream()
+		    	    		.forEach(l -> l.stream()
+		    	    				.limit((long)(l.size() / 10))
+		    	    				.reduce((x,y) -> (x.getValue() < y.getValue() ? x : y ))
+		    	    				.ifPresent(p -> BestValueFromTenProcentLists.add(p)));
+	
+		    	    				
+		    	    		
+		} catch (IOException e) {
+
+		}
+
+		for (int i = 0; i < filteredByNationalityList.size(); i++) {
+			System.out.println("Country: " + filteredByNationalityList.get(i).Nationality + " Name: " + filteredByNationalityList.get(i).Name + " "
+					+ "Potential: " + filteredByNationalityList.get(i).getPotential());
+		}
+		System.out.println("\n");
+		for (int i = 0; i < filteredByAgeList.size(); i++) {
+			System.out.println("Age: " + filteredByAgeList.get(i).Age + " Name: " + filteredByAgeList.get(i).Name + " "
+					+ "Potential: " + filteredByAgeList.get(i).getPotential());
+		}
+		
+		for (int i = 0; i < BestValueFromTenProcentLists.size(); i++) {
+		System.out.println("Country: " + BestValueFromTenProcentLists.get(i).Nationality + " Name: " + BestValueFromTenProcentLists.get(i).Name + " "
+				+ "Potential: " + BestValueFromTenProcentLists.get(i).getPotential() + "Value: "+BestValueFromTenProcentLists.get(i).Value);
+	}
+
+
+		double nano_endTime = System.nanoTime();
+		double total = nano_endTime - startTime;
+		System.out.println("Sequential endtime: " + total);
 	}
 
 	public static <T> Predicate<T> distinctByProperty(Function<? super T, ?> keyExtractor) {
@@ -200,7 +293,7 @@ public class parallel {
 	        if (hasDot) {
 	        	value = value / 10;
 	        }
-
+	        
 	        return value;
 	    }
 
