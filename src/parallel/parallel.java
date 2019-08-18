@@ -195,7 +195,7 @@ public class parallel {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
-    private static Function<String, Player> mapToItem = (line) -> {
+    static Function<String, Player> mapToItem = (line) -> {
 
         String[] p = line.split(",");// a CSV has comma separated lines
         Player player = new Player();
@@ -226,7 +226,7 @@ public class parallel {
         return player;
     };
 
-    private static int splitString(String str) {
+    static int splitString(String str) {
 
         if (!str.equals("")) {
             //remove euro sign

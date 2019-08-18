@@ -1,16 +1,23 @@
 package parallel;
 
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
+
+import static parallel.parallel.mapToItem;
+
 
 public class ProducerConsumer implements Runnable {
 
     private static final int CONSUMER_COUNT = 1;
-    private final static BlockingQueue<String> linesReadQueue = new ArrayBlockingQueue<>(30);
+    private final static BlockingQueue<Player> linesReadQueue = new ArrayBlockingQueue<>(30);
 
     private boolean isConsumer;
     private static boolean producerIsDone = false;
@@ -38,12 +45,35 @@ public class ProducerConsumer implements Runnable {
 
     private void readFile() {
         Path file = Paths.get("data.csv");
+        String data = "data.csv";
         long startTime = System.nanoTime();
         try {
-            //Java 8: Stream class
-            Stream<String> lines = Files.lines(file, StandardCharsets.UTF_8).skip(1);
+            File inputF =
+                    new File(data);
+            InputStream inputFS = new FileInputStream(inputF);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
 
-            for (String line : (Iterable<String>) lines::iterator) {
+            //   dit wordt nog niet gebruik.
+            List<Player> filteredByNationalityList = new ArrayList<Player>();
+            List<Player> filteredByAgeList = new ArrayList<Player>();
+            List<Player> BestValueFromTenProcentLists = new ArrayList<Player>();
+
+            Comparator<Player> compareByNationality = Comparator.comparing(o -> o.getNationality());
+
+            Comparator<Player> compareByNationalityThenPotential = compareByNationality.reversed().thenComparing((Player p) -> p.Potential).reversed();
+            Comparator<Player> compareByAgeThenPotential = Comparator
+                    .comparing(Player::getAge).thenComparing((Player p) -> p.Potential).reversed();
+
+            Comparator<Player> compareByPotential = Comparator.comparing(Player::getPotential).reversed();
+            // tot en met hier. Maar ik denk dat dit nog wel makkelijk in te bouwen is. Hij doet nu alles en print alles.
+            // in principe kunnen we al die system out prints er ook tussen uit halen voor de leesbaarheid.
+
+            //Java 8: Stream class
+            Stream<Player> lines = Files.lines(Paths.get(data), StandardCharsets.UTF_8).skip(1).map(mapToItem);
+
+            // deze vervangen voor de gefilterde lijsten.
+            for (Player line : (Iterable<Player>) lines::iterator) {
+
                 System.out.println("read=" + line);
                 linesReadQueue.put(line); //blocked if reaches its capacity, until consumer consumes
 //                System.out.println(Thread.currentThread().getName() + ":: producer count = " + linesReadQueue.size());
@@ -70,9 +100,8 @@ public class ProducerConsumer implements Runnable {
     private void consume() {
         try {
             while (!producerIsDone || (producerIsDone && !linesReadQueue.isEmpty())) {
-                String lineToProcess = linesReadQueue.take();
-//                processCpuDummy(); // some CPU intensive processing
-                System.out.println("procesed:" + lineToProcess);
+                Player lineToProcess = linesReadQueue.take();
+                System.out.println("procesed:" + lineToProcess.getName() + " " + lineToProcess.Potential);
                 System.out.println(Thread.currentThread().getName() + ":: consumer count:" + linesReadQueue.size());
             }
         } catch (Exception e) {
@@ -82,11 +111,4 @@ public class ProducerConsumer implements Runnable {
         System.out.println(Thread.currentThread().getName() + " consumer is done");
     }
 
-//    private void processCpuDummy() {
-//        //takes ~ 15 ms of CPU time
-//        //did not use Thread.sleep() as it does not consume any CPU cycles
-//        for (long i = 0; i < 100000000L; i++) {
-//            i = i + 1;
-//        }
-//    }
 }
