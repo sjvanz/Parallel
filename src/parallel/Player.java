@@ -4,11 +4,11 @@ public  class Player{
 
     String Name;
     String Age;
-    String BallControl;
-    String SprintSpeed;
-    String Vision;
-    String SkillMoves;
-    String WeakFoot;
+    private String BallControl;
+    private String SprintSpeed;
+    private String Vision;
+    private String SkillMoves;
+    private String WeakFoot;
     String Nationality;
 	Integer Potential;
 	Integer Value;
@@ -29,19 +29,11 @@ public  class Player{
        Age = age;
    }
 
-   public String getBallControl() {
-       return BallControl;
-   }
-
-   public void setBallControl(String ballControl) {
+   void setBallControl(String ballControl) {
        BallControl = ballControl;
    }
 
-   public String getSprintSpeed() {
-       return SprintSpeed;
-   }
-
-   public void setSprintSpeed(String sprintSpeed) {
+   void setSprintSpeed(String sprintSpeed) {
        SprintSpeed = sprintSpeed;
    }
 
@@ -53,19 +45,11 @@ public  class Player{
        Vision = vision;
    }
 
-   public String getSkillMoves() {
-       return SkillMoves;
-   }
-
-   public void setSkillMoves(String skillMoves) {
+   void setSkillMoves(String skillMoves) {
        SkillMoves = skillMoves;
    }
 
-   public String getWeakFoot() {
-       return WeakFoot;
-   }
-
-   public void setWeakFoot(String weakFoot) {
+   void setWeakFoot(String weakFoot) {
        WeakFoot = weakFoot;
    }
    
@@ -92,7 +76,7 @@ public int getPotential( ) {
    }
    
    
-   public void setPotential() {
+   void setPotential() {
 	   if((this.BallControl == null  || this.BallControl.isEmpty())) {
 		   this.BallControl = "0";
 	   }
@@ -109,11 +93,11 @@ public int getPotential( ) {
 		   this.WeakFoot = "0";
 	   }
 	   this.Potential = (
-			   Integer.valueOf(this.BallControl) +
-			   (Integer.valueOf(this.SkillMoves)* 20) + 
-			   Integer.valueOf(this.SprintSpeed)  +
-			   Integer.valueOf(this.Vision) + 
-			   (Integer.valueOf(this.WeakFoot)* 20))/5;
+			   Integer.parseInt(this.BallControl) +
+			   (Integer.parseInt(this.SkillMoves)* 20) +
+			   Integer.parseInt(this.SprintSpeed)  +
+			   Integer.parseInt(this.Vision) +
+			   (Integer.parseInt(this.WeakFoot)* 20))/5;
 	   }
    
 }
