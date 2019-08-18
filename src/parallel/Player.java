@@ -11,16 +11,7 @@ public  class Player{
     String WeakFoot;
     String Nationality;
 	Integer Potential;
-
-//   public Player(String name, int age, int ballControl, int sprintSpeed, int vision, int skillMoves, int weakFoot) {
-//       Name = name;
-//       Age = age;
-//       BallControl = ballControl;
-//       SprintSpeed = sprintSpeed;
-//       Vision = vision;
-//       SkillMoves = skillMoves;
-//       WeakFoot = weakFoot;
-//   }
+	Integer Value;
 
    public String getName() {
        return Name;
@@ -87,7 +78,16 @@ public  class Player{
 	   Nationality = nationality;
    }
    
-   public int getPotential( ) {
+   
+   public Integer getValue() {
+	return Value;
+   }
+
+   public void setValue(Integer value) {
+	Value = value;
+   }
+
+public int getPotential( ) {
 	   return Potential;
    }
    
