@@ -3,6 +3,7 @@ package parallel;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class parallel {
         List<Player> filteredByNationalityList = new ArrayList<Player>();
         List<Player> filteredByAgeList = new ArrayList<Player>();
         List<Player> BestValueFromTenProcentLists = new ArrayList<Player>();
-        double startTime = System.nanoTime();
+        long startTime = System.nanoTime();
 
         try {
             File inputF =
@@ -73,7 +74,6 @@ public class parallel {
                             .reduce((x, y) -> (x.getValue() < y.getValue() ? x : y))
                             .ifPresent(BestValueFromTenProcentLists::add));
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,16 +98,16 @@ public class parallel {
         }
 
 
-        double nano_endTime = System.nanoTime();
-        double total = nano_endTime - startTime;
-        System.out.println("\nParallel endtime: " + total);
+        long endTime = System.nanoTime();
+        long elapsedTimeInMillis = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
+        System.out.println("Total elapsed time: " + elapsedTimeInMillis + " ms");
     }
 
     public static void notParallel(String data) {
         List<Player> filteredByNationalityList = new ArrayList<Player>();
         List<Player> filteredByAgeList = new ArrayList<Player>();
         List<Player> BestValueFromTenProcentLists = new ArrayList<Player>();
-        double startTime = System.nanoTime();
+        long startTime = System.nanoTime();
 
         try {
             File inputF =
@@ -185,12 +185,12 @@ public class parallel {
                     + " Potential:" + bestValueFromTenProcentList.getPotential() + " Value: " + bestValueFromTenProcentList.Value);
         }
 
-        double nano_endTime = System.nanoTime();
-        double total = nano_endTime - startTime;
-        System.out.println("\nSequential endtime: " + total);
+        long endTime = System.nanoTime();
+        long elapsedTimeInMillis = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
+        System.out.println("Total elapsed time: " + elapsedTimeInMillis + " ms");
     }
 
-    private static <T> Predicate<T> distinctByProperty(Function<? super T, ?> keyExtractor) {
+    public static <T> Predicate<T> distinctByProperty(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
     }
